@@ -22,71 +22,71 @@ public class DataInitializer {
     public CommandLineRunner initData(CourseRepository courseRepository) {
         return args -> {
             if (courseRepository.count() == 0) {
-                log.info("Initializing demo course data...");
+                log.info("Initializing course data...");
                 List<Course> courses = List.of(
                     Course.builder()
-                        .name("Java Spring Boot desde Cero")
+                        .name("Herramientas DevStudio")
                         .instructor("Mitsu Kahari")
                         .durationHours(40)
-                        .cost(new BigDecimal("49.99"))
-                        .description("Aprende a crear APIs REST profesionales con Spring Boot 3")
+                        .cost(new BigDecimal("25000"))
+                        .description("Inicia tu creacion dentro del software Studio.")
                         .category("Backend")
                         .maxStudents(50)
                         .available(true)
                         .build(),
                     Course.builder()
-                        .name("React.js Avanzado")
+                        .name("Tecnicas de modelaje 3D")
                         .instructor("Alonso Yañez")
                         .durationHours(35)
-                        .cost(new BigDecimal("59.99"))
-                        .description("Domina React hooks, Context API y patrones avanzados")
+                        .cost(new BigDecimal("15000"))
+                        .description("Aprende mejores tecnicas para modelar en Blender 3D.")
                         .category("Frontend")
                         .maxStudents(40)
                         .available(true)
                         .build(),
                     Course.builder()
-                        .name("Python para Data Science")
+                        .name("Payment Skills")
                         .instructor("Vicente Villegas")
                         .durationHours(50)
-                        .cost(new BigDecimal("69.99"))
-                        .description("Analisis de datos con Pandas, NumPy y Matplotlib")
+                        .cost(new BigDecimal("40000"))
+                        .description("Descubre como funciona el Payment de Studio y gestiona tu futuro.")
                         .category("Data Science")
                         .maxStudents(60)
                         .available(true)
                         .build(),
                     Course.builder()
-                        .name("Docker y Kubernetes")
+                        .name("Development Teams")
                         .instructor("Benjamin Yañez")
                         .durationHours(30)
-                        .cost(new BigDecimal("44.99"))
-                        .description("Contenedores y orquestacion para aplicaciones modernas")
+                        .cost(new BigDecimal("10000"))
+                        .description("Inicia este curso para encontrar gente con la que crear juntos.")
                         .category("DevOps")
                         .maxStudents(35)
                         .available(true)
                         .build(),
                     Course.builder()
-                        .name("Base de Datos con PostgreSQL")
+                        .name("Introduccion a LUA")
                         .instructor("Keznit Deus")
                         .durationHours(25)
-                        .cost(new BigDecimal("39.99"))
-                        .description("Administracion y desarrollo con PostgreSQL")
+                        .cost(new BigDecimal("35000"))
+                        .description("Aprende desde cero LUA.")
                         .category("Database")
                         .maxStudents(30)
                         .available(true)
                         .build(),
                     Course.builder()
-                        .name("Microservicios con Spring Cloud")
+                        .name("LUA de manera avanzada")
                         .instructor("Mitsu Kahari")
                         .durationHours(45)
-                        .cost(new BigDecimal("74.99"))
-                        .description("Arquitectura de microservicios, Eureka, API Gateway y Circuit Breaker")
+                        .cost(new BigDecimal("65000"))
+                        .description("Profundiza como LUA funciona en el mundo de la programacion.")
                         .category("Backend")
                         .maxStudents(45)
                         .available(true)
                         .build()
                 );
                 courseRepository.saveAll(courses);
-                log.info("Initialized {} demo courses", courses.size());
+                log.info("Initialized {} courses", courses.size());
             }
         };
     }

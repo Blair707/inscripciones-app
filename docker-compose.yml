@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  edu-platform:
+  inscripciones-app:
     build:
       context: .
       dockerfile: Dockerfile
@@ -20,9 +20,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    networks:
-      - edu-network
 
 networks:
-  edu-network:
+  default:
     driver: bridge

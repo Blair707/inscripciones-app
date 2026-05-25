@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - EduPlatform
+name: CI/CD Pipeline - InscripcionesApp
 
 on:
   push:
@@ -11,13 +11,9 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  # =============================================
-  # JOB 1: Build & Test
-  # =============================================
   build-and-test:
     name: Build & Run Tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,7 +35,7 @@ jobs:
           name: test-results
           path: target/surefire-reports/
 
-      - name: Build JAR (skip tests, already ran)
+      - name: Build JAR
         run: mvn package -DskipTests -B
 
       - name: Upload JAR artifact
@@ -48,15 +44,11 @@ jobs:
           name: app-jar
           path: target/inscripciones-app-1.0.0.jar
 
-  # =============================================
-  # JOB 2: Build & Push Docker Image
-  # =============================================
   docker-build-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
     needs: build-and-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -95,18 +87,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Image digest summary
-        run: echo "Image pushed ${{ env.DOCKER_IMAGE }}:latest"
-
-  # =============================================
-  # JOB 3: Deploy to AWS EC2
-  # =============================================
   deploy-to-ec2:
     name: Deploy to AWS EC2
     runs-on: ubuntu-latest
     needs: docker-build-push
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
     steps:
       - name: Deploy via SSH to EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -116,20 +101,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-            echo "==============================="
-            echo "  EduPlatform Deployment Start"
-            echo "==============================="
-
-            # Pull latest image
             docker pull ${{ env.DOCKER_IMAGE }}:latest
-
-            # Stop and remove existing container
-            docker stop inscripciones-app-app 2>/dev/null || true
-            docker rm inscripciones-app-app 2>/dev/null || true
-
-            # Start new container
+            docker stop inscripciones-app 2>/dev/null || true
+            docker rm inscripciones-app 2>/dev/null || true
             docker run -d \
-              --name inscripciones-app-app \
+              --name inscripciones-app \
               --restart unless-stopped \
               -p 8080:8080 \
               -e DB_URL="${{ secrets.DB_URL }}" \
@@ -137,34 +113,12 @@ jobs:
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
               -e SPRING_PROFILES_ACTIVE=prod \
               ${{ env.DOCKER_IMAGE }}:latest
-
-            # Wait for health check
-            echo "Waiting for application to start..."
             sleep 30
-
-            # Verify deployment
-            for i in {1..5}; do
-              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health)
-              if [ "$STATUS" = "200" ]; then
-                echo "✅ Application is healthy!"
-                break
-              fi
-              echo "Attempt $i: Status $STATUS - retrying in 10s..."
-              sleep 10
-            done
-
-            # Clean up old images
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health)
+            if [ "$STATUS" = "200" ]; then
+              echo "Application is healthy"
+            else
+              echo "Health check failed with status $STATUS"
+              exit 1
+            fi
             docker image prune -f
-
-            echo "==============================="
-            echo "  Deployment Completed!"
-            echo "==============================="
-
-      - name: Notify deployment result
-        if: always()
-        run: |
-          if [ "${{ job.status }}" = "success" ]; then
-            echo "✅ Deployment to EC2 SUCCEEDED"
-          else
-            echo "❌ Deployment to EC2 FAILED"
-          fi

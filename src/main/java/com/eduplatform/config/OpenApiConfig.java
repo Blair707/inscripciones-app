@@ -17,25 +17,14 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("InscripcionesApp - API de Inscripción de Cursos")
+                        .title("InscripcionesApp - API de Inscripcion de Cursos")
                         .version("1.0.0")
-                        .description("""
-                                REST API for managing virtual course enrollment.
-                                
-                                ## Features
-                                - 📚 List available courses with details (name, instructor, duration, cost)
-                                - ➕ Add new courses to the educational catalog
-                                - 🎓 Enroll students in one or more courses
-                                - 🧾 Generate enrollment summaries with total cost calculation
-                                - 🏷️ Automatic discounts: 5% for 2 courses, 10% for 3 or more
-                                - 🔍 Filter courses by category, keyword, and price range
-                                
-                                ## Payment Methods
-                                CREDIT_CARD, DEBIT_CARD, BANK_TRANSFER, PAYPAL, CASH
-                                """)
+                        .description("REST API para la gestion de inscripciones en cursos virtuales. " +
+                                "Permite listar cursos, agregar nuevos cursos e inscribir estudiantes " +
+                                "con calculo automatico de descuentos y resumen de pago.")
                         .contact(new Contact()
                                 .name("InscripcionesApp Team")
-                                .email("dev@eduplatform.com"))
+                                .email("dev@inscripcionesapp.com"))
                         .license(new License()
                                 .name("MIT License")))
                 .servers(List.of(

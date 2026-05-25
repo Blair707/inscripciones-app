@@ -26,7 +26,6 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public List<CourseResponseDto> getAllAvailableCourses() {
-        log.info("Fetching all available courses");
         return courseRepository.findByAvailableTrue()
                 .stream()
                 .map(this::mapToResponseDto)
@@ -50,7 +49,6 @@ public class CourseService {
 
     @Transactional
     public CourseResponseDto createCourse(CourseRequestDto request) {
-        log.info("Creating new course: {}", request.getName());
         if (courseRepository.existsByNameIgnoreCase(request.getName())) {
             throw new BusinessException("A course with the name '" + request.getName() + "' already exists");
         }
@@ -64,17 +62,13 @@ public class CourseService {
                 .maxStudents(request.getMaxStudents())
                 .available(true)
                 .build();
-
-        Course saved = courseRepository.save(course);
-        log.info("Course created successfully with ID: {}", saved.getId());
-        return mapToResponseDto(saved);
+        return mapToResponseDto(courseRepository.save(course));
     }
 
     @Transactional
     public CourseResponseDto updateCourse(Long id, CourseRequestDto request) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course", id));
-
         course.setName(request.getName());
         course.setInstructor(request.getInstructor());
         course.setDurationHours(request.getDurationHours());
@@ -82,7 +76,6 @@ public class CourseService {
         course.setDescription(request.getDescription());
         course.setCategory(request.getCategory());
         course.setMaxStudents(request.getMaxStudents());
-
         return mapToResponseDto(courseRepository.save(course));
     }
 

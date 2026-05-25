@@ -1,7 +1,6 @@
 package com.eduplatform.service;
 
 import com.eduplatform.dto.StudentRequestDto;
-import com.eduplatform.exception.BusinessException;
 import com.eduplatform.exception.ResourceNotFoundException;
 import com.eduplatform.model.Student;
 import com.eduplatform.repository.StudentRepository;
@@ -21,7 +20,6 @@ public class StudentService {
     public Student createOrGetStudent(StudentRequestDto request) {
         return studentRepository.findByEmailIgnoreCase(request.getEmail())
                 .orElseGet(() -> {
-                    log.info("Creating new student: {}", request.getEmail());
                     Student student = Student.builder()
                             .name(request.getName())
                             .email(request.getEmail().toLowerCase())

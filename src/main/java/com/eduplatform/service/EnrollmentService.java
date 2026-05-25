@@ -29,14 +29,11 @@ public class EnrollmentService {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
 
-    // Discount rules: 2 courses = 5%, 3+ courses = 10%
     private static final BigDecimal DISCOUNT_2_COURSES = new BigDecimal("5.00");
     private static final BigDecimal DISCOUNT_3_PLUS_COURSES = new BigDecimal("10.00");
 
     @Transactional
     public EnrollmentSummaryDto enrollStudent(EnrollmentRequestDto request) {
-        log.info("Processing enrollment for student ID: {}", request.getStudentId());
-
         Student student = studentRepository.findById(request.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Student", request.getStudentId()));
 
@@ -50,12 +47,10 @@ public class EnrollmentService {
                         .orElseThrow(() -> new ResourceNotFoundException("Course", id)))
                 .collect(Collectors.toList());
 
-        // Validate all courses are available
         courses.forEach(course -> {
             if (!course.getAvailable()) {
                 throw new BusinessException("Course '" + course.getName() + "' is not currently available");
             }
-            // Check capacity
             if (course.getMaxStudents() != null) {
                 Long enrolled = enrollmentRepository.countEnrollmentsByCourseId(course.getId());
                 if (enrolled >= course.getMaxStudents()) {
@@ -64,17 +59,14 @@ public class EnrollmentService {
             }
         });
 
-        // Calculate amounts
         BigDecimal subtotal = courses.stream()
                 .map(Course::getCost)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal discountPct = calculateDiscount(courses.size());
-        BigDecimal discountAmount = subtotal.multiply(discountPct)
-                .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        BigDecimal discountAmount = subtotal.multiply(discountPct).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         BigDecimal finalAmount = subtotal.subtract(discountAmount);
 
-        // Resolve payment method
         Enrollment.PaymentMethod paymentMethod = null;
         if (request.getPaymentMethod() != null) {
             try {
@@ -94,16 +86,13 @@ public class EnrollmentService {
                 .paymentMethod(paymentMethod)
                 .build();
 
-        Enrollment saved = enrollmentRepository.save(enrollment);
-        log.info("Enrollment created with ID: {}", saved.getId());
-        return mapToSummaryDto(saved);
+        return mapToSummaryDto(enrollmentRepository.save(enrollment));
     }
 
     @Transactional(readOnly = true)
     public EnrollmentSummaryDto getEnrollmentById(Long id) {
-        Enrollment enrollment = enrollmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Enrollment", id));
-        return mapToSummaryDto(enrollment);
+        return mapToSummaryDto(enrollmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment", id)));
     }
 
     @Transactional(readOnly = true)
@@ -160,8 +149,7 @@ public class EnrollmentService {
                 .discountPercentage(enrollment.getDiscountPercentage())
                 .discountAmount(discountAmount)
                 .totalAmount(enrollment.getFinalAmount())
-                .paymentMethod(enrollment.getPaymentMethod() != null
-                        ? enrollment.getPaymentMethod().name() : null)
+                .paymentMethod(enrollment.getPaymentMethod() != null ? enrollment.getPaymentMethod().name() : null)
                 .status(enrollment.getStatus().name())
                 .enrollmentDate(enrollment.getEnrollmentDate())
                 .build();

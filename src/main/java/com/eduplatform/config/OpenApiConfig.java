@@ -1,9 +1,7 @@
 package com.eduplatform.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,12 +25,7 @@ public class OpenApiConfig {
                                 "Generacion de boletas de inscripcion con calculo de precio final, " +
                                 "descuentos automaticos, multiples metodos de pago, " +
                                 "validacion de cupos y cancelacion de inscripciones."
-                        )
-                        .contact(new Contact()
-                                .name("InscripcionesApp Team")
-                                .email("dev@inscripcionesapp.com"))
-                        .license(new License()
-                                .name("MIT License")))
+                        ))
                 .servers(List.of(
                         new Server().url("/").description("Current server")
                 ));

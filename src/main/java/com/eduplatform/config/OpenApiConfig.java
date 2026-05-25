@@ -18,10 +18,16 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("InscripcionesApp - API de Inscripcion de Cursos")
-                        .version("1.0.0")
-                        .description("REST API para la gestion de inscripciones en cursos virtuales. " +
-                                "Permite listar cursos, agregar nuevos cursos e inscribir estudiantes " +
-                                "con calculo automatico de descuentos y resumen de pago.")
+                        .version("3.0")
+                        .description(
+                                "Pipeline de despliegue automatico con integracion continua via GitHub Actions, " +
+                                "Docker Hub y AWS EC2.\n\n" +
+                                "Listado de cursos disponibles con consultas eficientes y manejo de errores.\n\n" +
+                                "Registro de nuevos cursos con validacion de datos.\n\n" +
+                                "Generacion de boletas de inscripcion con calculo de precio final, " +
+                                "descuentos automaticos, multiples metodos de pago, " +
+                                "validacion de cupos y cancelacion de inscripciones."
+                        )
                         .contact(new Contact()
                                 .name("InscripcionesApp Team")
                                 .email("dev@inscripcionesapp.com"))

@@ -32,3 +32,5 @@ application-prod.properties
 ### OS ###
 .DS_Store
 Thumbs.db
+
+application.properties
